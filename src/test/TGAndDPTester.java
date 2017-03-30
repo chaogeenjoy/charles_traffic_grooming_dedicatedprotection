@@ -11,7 +11,7 @@ public class TGAndDPTester {
 		network.readPhysicalTopology("E:\\ÆäËû\\RPtopology\\NODE6.csv");
 		network.copyNodes();
 		network.createNodepair();
-	
+	    //test
 		
 		Layer ipLayer=network.getLayerlist().get("Layer0");
 		Layer optLayer=network.getLayerlist().get("Physical");
