@@ -11,6 +11,8 @@ public class Constant {
 	public final static int F=320;////每条光纤链路总共含有的Frequency Slots的数目
 	public final static int FREE=0;
 	public final static int BUSY=1;
+	public final static int WORK=0;
+	public final static int PROTECTION=1;
 	public final static int NUM_OF_ACTNODEPAIRS=100; 
 	public final static int WAVE_UNASSIGNMENT=0;
 	public final static int WAVE_ASSIGNMENTED=1;

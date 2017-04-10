@@ -143,11 +143,11 @@ public class Layer extends CommonObject{
 	 * remove link from the iplayer
 	 */
 	public void removeLink(String linkname){
-		Node nodeA=this.linklist.get(linkname).getNodeA();
+		/*Node nodeA=this.linklist.get(linkname).getNodeA();
 		Node nodeB=this.linklist.get(linkname).getNodeB();
 		nodeA.removeNeiNode(nodeB);
 		nodeB.removeNeiNode(nodeA);
-		this.linklist.get(linkname).setAssociatedLayer(null);
+		this.linklist.get(linkname).setAssociatedLayer(null);*/
 		this.linklist.remove(linkname);	
 	}
 

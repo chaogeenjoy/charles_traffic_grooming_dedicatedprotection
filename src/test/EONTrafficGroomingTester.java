@@ -6,11 +6,11 @@ import java.util.Iterator;
 import network.Layer;
 import network.Link;
 import network.Network;
-import trafficGrooming.TrafficGroomingJoinDedicatedProtection;
+import trafficGrooming.EONTrafficGrooming;
 
-public class TGAndDPTester {
+public class EONTrafficGroomingTester {
+
 	public static void main(String[] args) {
-
 		Network network=new Network("ip over wdm", 0, "");
 		network.readPhysicalTopology("D:\\ÆäËû\\RPtopology\\NODE24.csv");
 		network.copyNodes();
@@ -20,10 +20,10 @@ public class TGAndDPTester {
 		Layer optLayer=network.getLayerlist().get("Physical");
 		
 
-		TrafficGroomingJoinDedicatedProtection tfAP=new TrafficGroomingJoinDedicatedProtection();
-		tfAP.jointlyDesignedTGAndP(network, ipLayer, optLayer);
-		int transponderNum=tfAP.getTransponderNum();
-		System.out.println("\ntransponder num="+transponderNum);
+		EONTrafficGrooming eTG=new EONTrafficGrooming();
+		eTG.trafficGroominginEON(ipLayer, optLayer);
+		int transponderNum=eTG.getTransponderNum();
+		System.out.println("transponder num="+transponderNum);
 		
 		int maxSlot=0;
 		HashMap<String, Link> map=optLayer.getLinklist();
@@ -37,4 +37,5 @@ public class TGAndDPTester {
 		System.out.println("MaxSlot="+maxSlot);
 	}
 
+	
 }

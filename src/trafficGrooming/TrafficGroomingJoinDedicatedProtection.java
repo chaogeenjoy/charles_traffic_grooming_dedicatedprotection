@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import demand.Request;
+import general.Constant;
 import graphalgorithms.RouteSearching;
+import graphalgorithms.SearchConstraint;
 import network.Layer;
 import network.Link;
 import network.Network;
@@ -37,79 +39,154 @@ public class TrafficGroomingJoinDedicatedProtection {
 			NodePair currentNodePair = nodePairList.get(i);
 			Node srcNode = currentNodePair.getSrcNode();
 			Node destNode = currentNodePair.getDesNode();
-			System.out.println("\n\n当前操作的节点对是：" + srcNode.getName() + "--" + destNode.getName() + "\t其流量需求为："
+			System.out.println("\n\n\n----------------------------------------------------");
+			System.out.println("当前操作的节点对是：" + srcNode.getName() + "--" + destNode.getName() + "\t其流量需求为："
 					+ currentNodePair.getTrafficdemand());
-			/*
-			 * //遍历iplayer，排除容量不足以及保护属性的链路，
-			 * 然后在IP虚拟拓扑上路由当前拓扑
-			 */			
-			ArrayList<Link> tempDelLinkList = new ArrayList<Link>();
+			System.out.println("-------------------------------------------------");
+/*
+ * //遍历iplayer，排除容量不足以及保护属性的链路，
+ * 然后在IP虚拟拓扑上路由当前拓扑
+ */			
+			SearchConstraint constraint1=new SearchConstraint();
 			Iterator<String> itr0=ipLayer.getLinklist().keySet().iterator();
 			while(itr0.hasNext()){
 				Link link=(Link) ipLayer.getLinklist().get(itr0.next());
-//				System.out.println("IP层存储的链路："+link.getName()+"\t剩余容量为："+(link.getCapacity()-link.getSumFlow()));
-				if(((link.getCapacity()-link.getSumFlow())<currentNodePair.getTrafficdemand())||(link.getNature()==1)){
-					tempDelLinkList.add(link);
+				if(((link.getCapacity()-link.getSumFlow())<currentNodePair.getTrafficdemand())||(link.getNature()==1)){//属性：0 工作 1 保护
+					constraint1.getExcludedLinklist().add(link);
 					
-					//ipLayer.removeLink(link.getName());
 				}
-			}
-			for(Link link:tempDelLinkList){
-				ipLayer.removeLink(link.getName());			   
-			}
-
-			/*
-			 * 输出剩余的链路
-			 */
-			Iterator<String> itr10=ipLayer.getLinklist().keySet().iterator();
-			while(itr10.hasNext()){
-				Link linkn=(Link) ipLayer.getLinklist().get(itr10.next());
-				System.out.println("剩余的链路："+(linkn.getName())+"\t"+(linkn.getCapacity()-linkn.getSumFlow())+"\t"+linkn.getCost()+"\t"+linkn.getLength());
-			}
-			
-			/*
-			 * 输出节点
-			 */
-			/*Iterator<String> itr11=ipLayer.getNodelist().keySet().iterator();
-			while(itr11.hasNext()){
-				Node node=(Node) ipLayer.getNodelist().get(itr11.next());
-				System.out.println("\n\n剩余节点为："+node.getName()+"\t其相邻的节点为：");
-				for(Node node1:node.getNeinodelist()){
-					System.out.print("\t"+node1.getName());
-				}
-			}*/
+			}			
 			LinearRoute newWorkRouteIP=new LinearRoute("IPWorkingRoute",0,"");
 			RouteSearching rsIPWork=new RouteSearching();
-			rsIPWork.Dijkstras(srcNode, destNode, ipLayer, newWorkRouteIP, null);
-//			newWorkRouteIP.OutputRoute_node(newWorkRouteIP);
-			//在Ip层上路由成功以后，恢复排除的节点
-			for(Link link: tempDelLinkList){
-				ipLayer.addLink(link);
-			}
-			tempDelLinkList.clear();
-		
+			rsIPWork.Dijkstras(srcNode, destNode, ipLayer, newWorkRouteIP, constraint1);
+
 			/*
 			 * 在虚拟拓扑上路由工作路径成功
 			 * 
 			 */
 			
 			if(newWorkRouteIP.getLinklist().size()!=0){
-				System.out.println("\n\n******************在IP层路成功的由工作路径及分配资源！***********************\n\n");
+				System.out.print("1.工作路径IP层路成功的由及分配资源，路由如下***********************\n\t");
 				newWorkRouteIP.OutputRoute_node(newWorkRouteIP);
+				
+				//更新IP层链路信息
 				for(Link link: newWorkRouteIP.getLinklist()){
-					link.setNature(0);
-					link.setSumFlow(link.getSumFlow()+currentNodePair.getTrafficdemand());					
+					link.setNature(Constant.WORK);
+					link.setSumFlow(link.getSumFlow()+currentNodePair.getTrafficdemand());	
+					}
+/*
+ * IP路由保护路径，注意排除容量不足以及与工作链路在物理链路上有重叠的链路，以及所有的工作路径
+ */
+				SearchConstraint constraint2=new SearchConstraint();			
+				Iterator<String> itr1=ipLayer.getLinklist().keySet().iterator();
+				while(itr1.hasNext()){
+					Link link=(Link)(ipLayer.getLinklist().get(itr1.next()));
+					boolean flag=false;
+					//当该IP链路的物理链路包含工作路径所经过的物理路径  flag=true,否则为 false
+					out:for(Link link1: newWorkRouteIP.getLinklist()){
+						for(Link link2:link1.getPhysicalLink()){
+							if(link.getPhysicalLink().contains(link2)){
+								flag=true;
+								break out;
+							}
+						}
+					}
+					if((link.getCapacity()-link.getSumFlow()<currentNodePair.getTrafficdemand())||link.getNature()==Constant.WORK
+							||flag){
+						constraint2.getExcludedLinklist().add(link);
+					}
+				}
+				
+				
+				LinearRoute protectionRouteIP=new LinearRoute("", 1, "");
+				RouteSearching rsIPProt=new RouteSearching();
+				rsIPProt.Dijkstras(srcNode, destNode, ipLayer, protectionRouteIP, constraint2);
+				 
+				if(protectionRouteIP.getLinklist().size()!=0){
+					System.out.print("\n1.IP层路由保护路径成功！路径如下：***********************\n\t");
+					protectionRouteIP.OutputRoute_node(protectionRouteIP);
+					System.out.println("\n\n");
+					
+					
+					//更新IP层链路信息
+					for(Link link:protectionRouteIP.getLinklist()){
+						link.setNature(Constant.PROTECTION);
+						link.setSumFlow(link.getSumFlow()+currentNodePair.getTrafficdemand());
+					}
+				}else{
+					System.out.print("\n1.保护路径IP层路由失败*****************\n");
+/****************************************************************
+ * 在光层路由保护路径,删除工作路径所经过的物理链路
+ * **************************************************************
+ */
+//					排除工作路径所经过的物理链路
+					SearchConstraint constraint3=new SearchConstraint();
+					for(Link link:newWorkRouteIP.getLinklist()){
+						for(Link link1:link.getPhysicalLink()){
+							constraint3.getExcludedLinklist().add(link1);
+						}
+					}
+										
+					Node srcNode_OPP=optLayer.getNodelist().get(srcNode.getName());
+					Node destNode_OPP=optLayer.getNodelist().get(destNode.getName());
+					LinearRoute protectionRouteOP=new LinearRoute("optProtection",2,"");
+					RouteSearching rsOPProt=new RouteSearching();
+					rsOPProt.Dijkstras(srcNode_OPP, destNode_OPP, optLayer, protectionRouteOP, constraint3);
+					
+				
+					if(protectionRouteOP.getLinklist().size()==0){
+						System.out.println("\t保护路径在光层路由失败，歇菜了");
+					}else{
+						this.setTransponderNum(this.getTransponderNum()+2);
+						double l=protectionRouteOP.getLength();
+						double X=1;
+						if(l<500){
+							X=50;
+						}else if(l<1000){
+							X=37.5;
+						}else if(l<2000){
+							X=25;
+						}else{
+							X=12.5;
+						}
+						int slotNum=(int)Math.ceil(currentNodePair.getTrafficdemand()/X);
+						protectionRouteOP.setSlotsnum(slotNum);
+						ArrayList<Integer> indexArr=Request.spectrumAllocationOneRoute_ReqList(protectionRouteOP);
+						if(indexArr.size()==0){
+							System.out.println("\t堵塞，不分配频谱");
+						}else{
+							System.out.println("\t不堵塞，分配频谱资源");
+							for(Link link:protectionRouteOP.getLinklist()){
+								for(int index=indexArr.get(0);index<slotNum+indexArr.get(0);index++){
+									link.getSlotsArray().get(index).setStatus(1);
+									
+								}
+								link.setMaxSlot(slotNum+link.getMaxSlot());
+							}						
+						}
+						
+						
+						String name=srcNode.getName()+"-"+destNode.getName();
+						Link newLinkP=new Link(name, ipLayer.getLinklist().size(), "", ipLayer, srcNode, destNode, protectionRouteOP.getLength(),protectionRouteOP.getCost());
+						
+						newLinkP.setCapacity(slotNum*X);
+						newLinkP.setSumFlow(currentNodePair.getTrafficdemand());
+						newLinkP.setIpRemainFlow(newLinkP.getCapacity()-newLinkP.getSumFlow());
+						newLinkP.setNature(Constant.PROTECTION);
+						newLinkP.setPhysicalLink(protectionRouteOP.getLinklist());
+						ipLayer.addLink(newLinkP);
+						System.out.println("\t新的保护光路为"+newLinkP.getName()+"\tCapacity"+newLinkP.getCapacity()+"\t剩余："+newLinkP.getIpRemainFlow());
+						System.out.print("\t物理路由为\n\t");
+						protectionRouteOP.OutputRoute_node(protectionRouteOP);
+					}
 				}
 			}
-			
-			/*
-			 * 在虚拟拓扑上路由工作路径失败
-			 */
+		
 			else{
-			/*
-			 * 在光层路由，新建光路，排除容量不足，所有的工作链路，以及本次工作路径在物理链路有重叠的链路
-			 */
-				System.out.println("在IP层路由工作路径失败，转入光层处理");
+/*
+ * 2.在光层路由工作路径，新建光路，排除容量不足，所有的工作链路，以及本次工作路径在物理链路有重叠的链路
+ */
+				System.out.println("2.工作路径IP层路由失败，转入光层处理");
 				Node srcNode_OP=optLayer.getNodelist().get(srcNode.getName());
 				Node destNode_OP=optLayer.getNodelist().get(destNode.getName());
 				LinearRoute newWorkRouteOL=new LinearRoute("OptWorkingRoute",1,"");
@@ -138,10 +215,6 @@ public class TrafficGroomingJoinDedicatedProtection {
 					}
 					int slotNum=(int)Math.ceil(currentNodePair.getTrafficdemand()/X);
 				
-//					int slotNum=slotNumByDemand(currentNodePair.getTrafficdemand(), newWorkRouteOL.getLength());
-//					System.out.println("当前节点对工作路径占用的光层的slot个数是"+slotNum);
-					
-					
 					newWorkRouteOL.setSlotsnum(slotNum);
 					ArrayList<Integer> slotIndex=Request.spectrumAllocationOneRoute_ReqList(newWorkRouteOL);
 					/*
@@ -151,7 +224,7 @@ public class TrafficGroomingJoinDedicatedProtection {
 					if(slotIndex.size()==0){
 						System.out.println("堵塞了，没办法，不分配资源了");
 					}else{
-						//更新光层占用的链路的信息
+						System.out.println("\t不堵塞，分配资源");
 						for(Link link:newWorkRouteOL.getLinklist()){
 							for(int index=slotIndex.get(0);index<slotNum+slotIndex.get(0);index++){
 								link.getSlotsArray().get(index).setStatus(1);
@@ -161,21 +234,118 @@ public class TrafficGroomingJoinDedicatedProtection {
 						}						
 					}
 					
-//					//public Link(String name, int index, String comments, Layer associatedLayer, Node nodeA, Node nodeB, double length,
-//					double cost)
-					
+				
 					String name=srcNode.getName()+"-"+destNode.getName();
 					Link newLink=new Link(name, ipLayer.getLinklist().size(), "", ipLayer, srcNode, destNode, newWorkRouteOL.getLength(), newWorkRouteOL.getCost());
 					
 					newLink.setCapacity(X*slotNum);
 					newLink.setSumFlow(currentNodePair.getTrafficdemand());
 					newLink.setIpRemainFlow(newLink.getCapacity()-newLink.getSumFlow());
-					newLink.setNature(0);
+					newLink.setNature(Constant.WORK);
 					newLink.setPhysicalLink(newWorkRouteOL.getLinklist());
 					ipLayer.addLink(newLink);
-					System.out.println("新光路:"+newLink.getName()+"\tslot数目："+slotNum+"\tCapacity:"+newLink.getCapacity()+"\t剩余流量是："+(newLink.getCapacity()-newLink.getSumFlow()));
-					System.out.print("所经过的物理链路为");
+					System.out.println("\t新光路:"+newLink.getName()+"\tslot数目："+slotNum+"\tCapacity:"+newLink.getCapacity()+"\t剩余流量是："+(newLink.getCapacity()-newLink.getSumFlow()));
+					System.out.print("\t所经过的物理链路为");
 					newWorkRouteOL.OutputRoute_node(newWorkRouteOL);
+					
+					
+/*
+ * 2.IP层路由保护路径
+ */
+					SearchConstraint constraint4=new SearchConstraint();
+					Iterator<String> itr3=ipLayer.getLinklist().keySet().iterator();
+					while(itr3.hasNext()){
+						Link link=(Link) (ipLayer.getLinklist().get(itr3.next()));
+						boolean flag=false;
+						for(Link link1:newLink.getPhysicalLink()){
+							if(link.getPhysicalLink().contains(link1)){
+								flag=true;
+								break;
+							}
+						}
+						if(flag||(link.getIpRemainFlow()<currentNodePair.getTrafficdemand())||(link.getNature()==Constant.WORK)){
+							constraint4.getExcludedLinklist().add(link);
+						}
+					}
+					
+					LinearRoute protectionRouteIP=new LinearRoute("IPprotection",0,"");
+					RouteSearching rsIPP=new RouteSearching();
+					rsIPP.Dijkstras(srcNode, destNode, ipLayer, protectionRouteIP, constraint4);
+					
+					if(protectionRouteIP.getLinklist().size()!=0){
+						System.out.println("2保护路径IP层路由成功，路由如下**********************");
+						System.out.print("\t");
+						protectionRouteIP.OutputRoute_node(protectionRouteIP);
+						
+						for(Link link:protectionRouteIP.getLinklist()){
+							link.setNature(Constant.PROTECTION);
+							link.setSumFlow(link.getSumFlow()+currentNodePair.getTrafficdemand());
+						}
+					}else{
+						System.out.println("2保护路径IP层路由失败***************************");
+/************************
+ *2.光层路由保护路径 
+ ***************************
+ */
+
+						//排除新建的工作路径所经过的物理链路
+						SearchConstraint constraint5=new SearchConstraint();
+						for(Link link:newLink.getPhysicalLink()){
+							constraint5.getExcludedLinklist().add(link);
+						}
+						
+						
+						Node srcPNode_OP=optLayer.getNodelist().get(srcNode.getName());
+						Node destPNode_OP=optLayer.getNodelist().get(destNode.getName());
+						LinearRoute protectionOPRoute=new LinearRoute("", 4,"");
+						RouteSearching rsPOP=new RouteSearching();
+						rsPOP.Dijkstras(srcPNode_OP, destPNode_OP, optLayer, protectionOPRoute, constraint5);
+						
+						if(protectionOPRoute.getLinklist().size()==0){
+							System.out.println("2光层路由失败，哈哈哈");
+						}else{
+							this.setTransponderNum(this.getTransponderNum()+2);
+							double l1=protectionOPRoute.getLength();
+							double X1=1;
+							if(l1<500){
+								X1=50;
+							}else if(l1<1000){
+								X1=37.5;
+							}else if(l1<2000){
+								X1=25;
+							}else{
+								X1=12.5;
+							}
+							int slotNum1=(int)(Math.ceil(currentNodePair.getTrafficdemand()/X1));
+							protectionOPRoute.setSlotsnum(slotNum1);
+							ArrayList<Integer> slotIndex1=Request.spectrumAllocationOneRoute_ReqList(protectionOPRoute);
+							if(slotIndex1.size()==0){
+								System.out.println("\t堵塞，不分配资源");
+							}else{
+								System.out.println("\t不堵塞，分配资源");
+								for(Link link:protectionOPRoute.getLinklist()){
+									for(int j=slotIndex1.get(0);j<slotNum1+slotIndex1.get(0);j++){
+										link.getSlotsArray().get(j).setStatus(1);
+									}
+									link.setMaxSlot(link.getMaxSlot()+slotNum1);
+								}
+							}
+						
+							String name1=srcPNode_OP.getName()+"-"+destPNode_OP.getName();
+							Link newLink1=new Link(name1, ipLayer.getLinklist().size(), "", ipLayer, srcNode, destNode, protectionOPRoute.getLength(), protectionOPRoute.getCost());
+							
+							newLink1.setCapacity(slotNum1*X1);
+							newLink1.setSumFlow(currentNodePair.getTrafficdemand());
+							newLink1.setIpRemainFlow(newLink1.getCapacity()-newLink1.getSumFlow());
+							newLink1.setNature(Constant.PROTECTION);
+							newLink1.setPhysicalLink(protectionOPRoute.getLinklist());
+							ipLayer.addLink(newLink1);
+							System.out.println("\t新的保护光路为："+newLink1.getName()+"\tslotnum="+slotNum1+"\t剩余"+newLink1.getIpRemainFlow());
+							System.out.print("\t物理路由为：");
+							protectionOPRoute.OutputRoute_node(protectionOPRoute);
+						}
+					
+					}
 				}
 					
 				
@@ -185,21 +355,4 @@ public class TrafficGroomingJoinDedicatedProtection {
 	}
 
 
-	
-/*	public static int slotNumByDemand(double demand,double routeLength){
-		int slot=0;
-		double l=routeLength;
-		double X=1;
-		if(l<500){
-			X=50;
-		}else if(l<1000){
-			X=37.5;
-		}else if(l<2000){
-			X=25;
-		}else{
-			X=12.5;
-		}
-		slot=(int)Math.ceil(demand/X);
-		return slot;
-	}*/
 }
