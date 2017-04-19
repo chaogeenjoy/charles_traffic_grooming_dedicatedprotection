@@ -11,13 +11,13 @@ public class TestDemoDijkstraTester {
 		long now1=System.currentTimeMillis();
 		Network network = new Network("workNet", 0, "");
 		network.readPhysicalTopology("E:\\ÆäËû\\RPtopology\\NODE6.csv");	
-		network.copyNodes();
-		network.createNodepair();
+//		network.copyNodes();
+//		network.createNodepair();
 		
 		Layer layer=network.getLayerlist().get("Physical");
-		Layer ipLayer=network.getLayerlist().get("Layer0");
+//		Layer ipLayer=network.getLayerlist().get("Layer0");
 		Node node1=layer.getNodelist().get("N0");
-		Node node2=layer.getNodelist().get("N4");
+		Node node2=layer.getNodelist().get("N1");
 		LinearRoute newRoute=new LinearRoute("", 0, "");
 		
 		

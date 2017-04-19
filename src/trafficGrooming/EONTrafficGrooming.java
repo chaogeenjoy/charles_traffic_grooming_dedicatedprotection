@@ -5,10 +5,12 @@ import java.util.Iterator;
 
 import demand.Request;
 import graphalgorithms.RouteSearching;
+import graphalgorithms.SearchConstraint;
 import network.Layer;
 import network.Link;
 import network.Node;
 import network.NodePair;
+import network.VirtualLink;
 import subgraph.LinearRoute;
 
 public class EONTrafficGrooming {
@@ -21,11 +23,32 @@ private  int transponderNum=0;
 	public void setTransponderNum(int transponderNum) {
 		this.transponderNum = transponderNum;
 	}
-
-
-
-
-
+/*
+ * 用link中的virtualinkList进行
+ * 这里的
+ */
+	public void gooming_VL_NotShare(Layer ipLayer,Layer optLayer){
+		ArrayList<NodePair> nodePairList = Request.sortNodePair(ipLayer);
+		for (int i = 0; i < nodePairList.size(); i++){
+			NodePair currentNodePair = nodePairList.get(i);
+			Node srcNode = currentNodePair.getSrcNode();
+			Node destNode = currentNodePair.getDesNode();
+			System.out.println("\n\n当前操作的节点对是：" + srcNode.getName() + "--" + destNode.getName() + "\t其流量需求为："
+					+ currentNodePair.getTrafficdemand());
+			//在IP层应当保留的链路应当具有以下属性：1，剩余容量够用就OK了
+			SearchConstraint constraint0=new SearchConstraint();
+			Iterator<String> itr0=ipLayer.getLinklist().keySet().iterator();
+			while(itr0.hasNext()){
+				boolean flag=false;
+				Link link=(Link) ipLayer.getLinklist().get(itr0.next());
+				for(VirtualLink vtLink:link.getVirtualLinkList()){
+					if(vtLink.getRemanCapacity()>currentNodePair.getTrafficdemand()){
+						flag=true;
+					}
+				}
+			}
+		}
+	}
 	public  void trafficGroominginEON(Layer ipLayer, Layer optLayer) {
 		
 
@@ -46,11 +69,9 @@ private  int transponderNum=0;
 			Iterator<String> itr0=ipLayer.getLinklist().keySet().iterator();
 			while(itr0.hasNext()){
 				Link link=(Link) ipLayer.getLinklist().get(itr0.next());
-//				System.out.println("IP层存储的链路："+link.getName()+"\t剩余容量为："+(link.getCapacity()-link.getSumFlow()));
 				if(((link.getCapacity()-link.getSumFlow())<currentNodePair.getTrafficdemand())||(link.getNature()==1)){
 					tempDelLinkList.add(link);
 					
-					//ipLayer.removeLink(link.getName());
 				}
 			}
 			for(Link link:tempDelLinkList){
@@ -66,21 +87,11 @@ private  int transponderNum=0;
 				System.out.println("剩余的链路："+(linkn.getName())+"\t"+(linkn.getCapacity()-linkn.getSumFlow())+"\t"+linkn.getCost()+"\t"+linkn.getLength());
 			}
 			
-			/*
-			 * 输出节点
-			 */
-			/*Iterator<String> itr11=ipLayer.getNodelist().keySet().iterator();
-			while(itr11.hasNext()){
-				Node node=(Node) ipLayer.getNodelist().get(itr11.next());
-				System.out.println("\n\n剩余节点为："+node.getName()+"\t其相邻的节点为：");
-				for(Node node1:node.getNeinodelist()){
-					System.out.print("\t"+node1.getName());
-				}
-			}*/
+			
 			LinearRoute newWorkRouteIP=new LinearRoute("IPWorkingRoute",0,"");
 			RouteSearching rsIPWork=new RouteSearching();
 			rsIPWork.Dijkstras(srcNode, destNode, ipLayer, newWorkRouteIP, null);
-//			newWorkRouteIP.OutputRoute_node(newWorkRouteIP);
+
 			//在Ip层上路由成功以后，恢复排除的节点
 			for(Link link: tempDelLinkList){
 				ipLayer.addLink(link);
@@ -137,9 +148,6 @@ private  int transponderNum=0;
 					}
 					int slotNum=(int)Math.ceil(currentNodePair.getTrafficdemand()/X);
 				
-//					int slotNum=slotNumByDemand(currentNodePair.getTrafficdemand(), newWorkRouteOL.getLength());
-//					System.out.println("当前节点对工作路径占用的光层的slot个数是"+slotNum);
-					
 					
 					newWorkRouteOL.setSlotsnum(slotNum);
 					ArrayList<Integer> slotIndex=Request.spectrumAllocationOneRoute_ReqList(newWorkRouteOL);
@@ -159,9 +167,6 @@ private  int transponderNum=0;
 							link.setMaxSlot(slotNum+link.getMaxSlot());
 						}						
 					}
-					
-//					//public Link(String name, int index, String comments, Layer associatedLayer, Node nodeA, Node nodeB, double length,
-//					double cost)
 					
 					String name=srcNode.getName()+"-"+destNode.getName();
 					Link newLink=new Link(name, ipLayer.getLinklist().size(), "", ipLayer, srcNode, destNode, newWorkRouteOL.getLength(), newWorkRouteOL.getCost());
@@ -183,22 +188,5 @@ private  int transponderNum=0;
 		
 	}
 
-
 	
-/*	public static int slotNumByDemand(double demand,double routeLength){
-		int slot=0;
-		double l=routeLength;
-		double X=1;
-		if(l<500){
-			X=50;
-		}else if(l<1000){
-			X=37.5;
-		}else if(l<2000){
-			X=25;
-		}else{
-			X=12.5;
-		}
-		slot=(int)Math.ceil(demand/X);
-		return slot;
-	}*/
 }

@@ -86,6 +86,9 @@ public class Layer extends CommonObject{
 	public void setLinklist(HashMap<String, Link> linklist) {
 		this.linklist = linklist;
 	}
+	
+
+
 	public HashMap<String, NodePair> getNodepairlist() {
 		return nodepairlist;
 	}
@@ -127,7 +130,7 @@ public class Layer extends CommonObject{
 	public int getNodepair_num(){
 		 return this.nodepairlist.size();
 	 }
-	
+		
 	public void addLink(Link link){
 		this.linklist.put(link.getName(),link);
 		link.setAssociatedLayer(this);
@@ -143,11 +146,11 @@ public class Layer extends CommonObject{
 	 * remove link from the iplayer
 	 */
 	public void removeLink(String linkname){
-		/*Node nodeA=this.linklist.get(linkname).getNodeA();
+		Node nodeA=this.linklist.get(linkname).getNodeA();
 		Node nodeB=this.linklist.get(linkname).getNodeB();
 		nodeA.removeNeiNode(nodeB);
 		nodeB.removeNeiNode(nodeA);
-		this.linklist.get(linkname).setAssociatedLayer(null);*/
+		this.linklist.get(linkname).setAssociatedLayer(null);
 		this.linklist.remove(linkname);	
 	}
 

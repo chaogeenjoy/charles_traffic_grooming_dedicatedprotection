@@ -18,7 +18,7 @@ import subgraph.LinearRoute;
 public class TestForSWPBasedRSA {
 	public static void main(String[] args) {
 		Network network=new Network("network",0,"");
-		network.readPhysicalTopology("E:\\其他\\RPtopology\\NODE11_1.csv");
+		network.readPhysicalTopology("E:\\其他\\RPtopology\\NODE6.csv");
 		network.copyNodes();
 		network.createNodepair();
 		Layer optLayer=network.getLayerlist().get("Physical");

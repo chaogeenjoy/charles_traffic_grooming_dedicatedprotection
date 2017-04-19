@@ -24,6 +24,8 @@ public class Link extends CommonObject {
 	private int waveNum = 0; // 链路所承载的波长数，用于计算该链路所需的光纤数
 	private ArrayList<Slot> slotsArray;
 	private ArrayList<Integer> slotsIndexInOneSW;
+	private ArrayList<VirtualLink> virtualLinkList=new ArrayList<VirtualLink>();
+//	private ArrayList
 	private ArrayList<Link> physicalLink;// 在物理层所经过的link
 
 	public Link(String name, int index, String comments, Layer associatedLayer, Node nodeA, Node nodeB, double length,
@@ -166,11 +168,21 @@ public class Link extends CommonObject {
 	public void setSlotsIndexInOneSW(ArrayList<Integer> slotsIndexInOneSW) {
 		this.slotsIndexInOneSW = slotsIndexInOneSW;
 	}
+	
+
+	public ArrayList<VirtualLink> getVirtualLinkList() {
+		return virtualLinkList;
+	}
+
+	public void setVirtualLinkList(ArrayList<VirtualLink> virtualLinkList) {
+		this.virtualLinkList = virtualLinkList;
+	}
 
 	public ArrayList<Link> getPhysicalLink() {
 		return physicalLink;
 	}
 
+	
 	public void setPhysicalLink(ArrayList<Link> physicalLink) {
 		this.physicalLink = physicalLink;
 	}

@@ -97,7 +97,6 @@ public class TrafficGroomingJoinDedicatedProtection {
 					}
 				}
 				
-				
 				LinearRoute protectionRouteIP=new LinearRoute("", 1, "");
 				RouteSearching rsIPProt=new RouteSearching();
 				rsIPProt.Dijkstras(srcNode, destNode, ipLayer, protectionRouteIP, constraint2);
@@ -263,11 +262,10 @@ public class TrafficGroomingJoinDedicatedProtection {
 								break;
 							}
 						}
-						if(flag||(link.getIpRemainFlow()<currentNodePair.getTrafficdemand())||(link.getNature()==Constant.WORK)){
+						if(flag||(link.getCapacity()-link.getSumFlow()<currentNodePair.getTrafficdemand())||(link.getNature()==Constant.WORK)){
 							constraint4.getExcludedLinklist().add(link);
 						}
 					}
-					
 					LinearRoute protectionRouteIP=new LinearRoute("IPprotection",0,"");
 					RouteSearching rsIPP=new RouteSearching();
 					rsIPP.Dijkstras(srcNode, destNode, ipLayer, protectionRouteIP, constraint4);
