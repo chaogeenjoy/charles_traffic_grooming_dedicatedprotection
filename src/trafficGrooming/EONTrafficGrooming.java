@@ -27,7 +27,7 @@ private  int transponderNum=0;
  * 用link中的virtualinkList进行
  * 这里的
  */
-	public void gooming_VL_NotShare(Layer ipLayer,Layer optLayer){
+	public void gooming_VL_Sharable(Layer ipLayer,Layer optLayer){
 		ArrayList<NodePair> nodePairList = Request.sortNodePair(ipLayer);
 		for (int i = 0; i < nodePairList.size(); i++){
 			NodePair currentNodePair = nodePairList.get(i);
@@ -38,15 +38,39 @@ private  int transponderNum=0;
 			//在IP层应当保留的链路应当具有以下属性：1，剩余容量够用就OK了
 			SearchConstraint constraint0=new SearchConstraint();
 			Iterator<String> itr0=ipLayer.getLinklist().keySet().iterator();
-			while(itr0.hasNext()){
+			while(itr0.hasNext()){//只要虚链路列表中存在一条容量足够即可，反之，如果没有，则排除
 				boolean flag=false;
 				Link link=(Link) ipLayer.getLinklist().get(itr0.next());
 				for(VirtualLink vtLink:link.getVirtualLinkList()){
 					if(vtLink.getRemanCapacity()>currentNodePair.getTrafficdemand()){
 						flag=true;
+						break;
+					}
+				}
+				
+				if(!flag){
+					constraint0.getExcludedLinklist().add(link);
+				}
+			}
+			
+			RouteSearching rS0=new RouteSearching();
+			LinearRoute newRoute0=new LinearRoute("", 0, "");
+			rS0.Dijkstras(srcNode, destNode, ipLayer, newRoute0, constraint0);
+			constraint0.getExcludedLinklist().clear();
+			
+			
+			if(newRoute0.getLinklist().size()!=0){
+				System.out.println("1.在IP层路由成功工作路径");
+				newRoute0.OutputRoute_node(newRoute0);
+				
+				for(Link link:newRoute0.getLinklist()){
+					VirtualLink tempVrtLink=null;
+					for(VirtualLink vtLink:link.getVirtualLinkList()){
+						
 					}
 				}
 			}
+			
 		}
 	}
 	public  void trafficGroominginEON(Layer ipLayer, Layer optLayer) {
