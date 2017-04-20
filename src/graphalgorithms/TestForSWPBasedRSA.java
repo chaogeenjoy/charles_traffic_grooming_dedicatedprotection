@@ -38,7 +38,7 @@ public class TestForSWPBasedRSA {
 			System.out.println(nodePair.getName()+" "+trafficDemand+"  "+slotNum);
 			SWP RSAOnSWP=new SWP();
 			LinearRoute newRoute=new LinearRoute("route", 0, "");
-			newRoute=RSAOnSWP.minCost_RSABasedOnSWP_LengthLimited(optLayer, slotNum, srcNode, destNode, null, 1, 5000);
+			newRoute=RSAOnSWP.minCost_RSABasedOnSWP(optLayer, slotNum, srcNode, destNode, new SearchConstraint(), 1);
 //			                              (optLayer, FSNum, srcNode, destNode, newRoute, constraint, nature);
 			if(newRoute.getLinklist().size()!=0){
 				System.out.println("³É¹¦£¡");

@@ -26,7 +26,7 @@ public class SWP {
 	 * 
 	 */
 	public LinearRoute minCost_RSABasedOnSWP_LengthLimited(Layer optLayer, int FSNum, Node srcNode, Node destNode,
-			SearchConstraint constraint,int nature,int maxLength) {
+			SearchConstraint constraint,int status,int maxLength) {
 		LinearRoute newRoute=new LinearRoute("newRoute", 0,"");
 		double cost=Double.MAX_VALUE;
 		 LinearRoute tempRoute=new LinearRoute("tempRoute", 1,"");
@@ -52,7 +52,7 @@ public class SWP {
 		 if (newRoute.getLinklist().size() != 0) {
 				for (int i = startIndex; i < startIndex + FSNum; i++) {
 					for (Link link : newRoute.getLinklist()) {
-						link.getSlotsArray().get(i).setStatus(nature);
+						link.getSlotsArray().get(i).setStatus(status);
 					}
 				}
 				
@@ -73,7 +73,7 @@ public class SWP {
 	 * 
 	 */
 	public LinearRoute minCost_RSABasedOnSWP(Layer optLayer, int FSNum, Node srcNode, Node destNode,
-			SearchConstraint constraint,int nature) {
+			SearchConstraint constraint,int status) {
 		LinearRoute newRoute=new LinearRoute("newRoute", 0,"");
 		double cost=Double.MAX_VALUE;
 		 LinearRoute tempRoute=new LinearRoute("tempRoute", 1,"");
@@ -99,7 +99,7 @@ public class SWP {
 		 if (newRoute.getLinklist().size() != 0) {
 				for (int i = startIndex; i < startIndex + FSNum; i++) {
 					for (Link link : newRoute.getLinklist()) {
-						link.getSlotsArray().get(i).setStatus(nature);
+						link.getSlotsArray().get(i).setStatus(status);
 					}
 				}
 				
@@ -121,7 +121,7 @@ public class SWP {
 	 * 
 	 */
 	public LinearRoute firstFit_RSABasedOnSWP_LengthLimited(Layer optLayer, int FSNum, Node srcNode, Node destNode, 
-			SearchConstraint constraint, int nature,int maxLength) {
+			SearchConstraint constraint, int status,int maxLength) {
 		/*
 		 * 扫描每一个SWP进行路由查询，当第一次找到后就分配频谱，更新频谱资源信息
 		 */
@@ -146,7 +146,7 @@ public class SWP {
 		if (newRoute.getLinklist().size() != 0) {
 			for (int i = startIndex; i < startIndex + FSNum; i++) {
 				for (Link link : newRoute.getLinklist()) {
-					link.getSlotsArray().get(i).setStatus(nature);
+					link.getSlotsArray().get(i).setStatus(status);
 				}
 			}
 		}
@@ -167,7 +167,7 @@ public class SWP {
 	 * 
 	 */
 	public void firstFit_RSABasedOnSWP(Layer optLayer, int FSNum, Node srcNode, Node destNode, LinearRoute newRoute,
-			SearchConstraint constraint, int nature) {
+			SearchConstraint constraint, int status) {
 		/*
 		 * 扫描每一个SWP进行路由查询，当第一次找到后就分配频谱，更新频谱资源信息
 		 */
@@ -189,7 +189,7 @@ public class SWP {
 		if (newRoute.getLinklist().size() != 0) {
 			for (int i = startIndex; i < startIndex + FSNum; i++) {
 				for (Link link : newRoute.getLinklist()) {
-					link.getSlotsArray().get(i).setStatus(nature);
+					link.getSlotsArray().get(i).setStatus(status);
 				}
 			}
 		}
