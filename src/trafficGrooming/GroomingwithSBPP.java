@@ -31,8 +31,10 @@ public class GroomingwithSBPP {
 			NodePair currentNodePair=nodePairList.get(i);
 			Node srcNode=currentNodePair.getSrcNode();
 			Node destNode=currentNodePair.getDesNode();
-			System.out.println("\n\n当前操作的节点对是：" + srcNode.getName() + "--" + destNode.getName() + "\t其流量需求为："
-					+ currentNodePair.getTrafficdemand());
+			System.out.println("\n\n-------------------------------------------------------\n"
+					+ "当前操作的节点对是：" + srcNode.getName() + "--" + destNode.getName() + "\t其流量需求为："
+					+ currentNodePair.getTrafficdemand()
+					+"\n-------------------------------------------------------");
 			
 			
 			/**
@@ -63,6 +65,7 @@ public class GroomingwithSBPP {
 						link.setLength(maxVTLink.getLength());
 					}else{
 						constraint0.getExcludedLinklist().add(link);
+						System.out.println("删除的链路为"+link.getName());
 					}
 				}
 			}
@@ -75,6 +78,7 @@ public class GroomingwithSBPP {
 			
 			if(newRoute0.getLinklist().size()!=0){
 				System.out.println("1.路由成功");
+				System.out.print("\t");
 				newRoute0.OutputRoute_node(newRoute0);
 				for(Link link:newRoute0.getLinklist()){
 					double maxRemain=0.0;
@@ -108,6 +112,7 @@ public class GroomingwithSBPP {
 				if(optNewRoute0.getLinklist().size()==0){
 					System.out.println("2.光层路由失败");
 				}else{
+					System.out.println("2.光层路由成功");
 					this.setTransponderNum(this.getTransponderNum()+2);
 					double len0=optNewRoute0.getLength();
 					double X0=1;
@@ -144,8 +149,9 @@ public class GroomingwithSBPP {
 					VirtualLink newVTLink=new VirtualLink(optNewRoute0.getCost(),optNewRoute0.getLength(), X0*slotNum0, X0*slotNum0-currentNodePair.getTrafficdemand());
 				    newVTLink.setNature(Constant.PROTECTION);
 				    newVTLink.setPhyLinkList(optNewRoute0.getLinklist());
+				    newLink0.getVirtualLinkList().add(newVTLink);
 				    ipLayer.addLink(newLink0);
-				    System.out.println("2.新建光路成功\t"+newLink0.getName()+"\tslot num:"+slotNum0);
+				    System.out.println("\t新建光路成功\t"+newLink0.getName()+"\tslot num:"+slotNum0);
 				    System.out.print("\t");
 				    optNewRoute0.OutputRoute_node(optNewRoute0);
 				}
