@@ -27,7 +27,7 @@ private  int transponderNum=0;
  * 用link中的virtualinkList进行
  * 这里的
  */
-	public void gooming_VL_Sharable(Layer ipLayer,Layer optLayer){
+	/*public void gooming_VL_Sharable(Layer ipLayer,Layer optLayer){
 		ArrayList<NodePair> nodePairList = Request.sortNodePair(ipLayer);
 		for (int i = 0; i < nodePairList.size(); i++){
 			NodePair currentNodePair = nodePairList.get(i);
@@ -72,7 +72,7 @@ private  int transponderNum=0;
 			}
 			
 		}
-	}
+	}*/
 	public  void trafficGroominginEON(Layer ipLayer, Layer optLayer) {
 		
 
