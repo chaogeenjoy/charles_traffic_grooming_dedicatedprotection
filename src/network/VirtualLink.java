@@ -80,6 +80,12 @@ public class VirtualLink {
 		this.phyLinkList = phyLinkList;
 	}
 
+	@Override
+	public String toString() {
+		return "VirtualLink [nature=" + nature + ", cost=" + cost + ", length=" + length + ", capacity=" + capacity
+				+ ", remanCapacity=" + remanCapacity + "]";
+	}
+
 	/*public int getStartIndex() {
 		return startIndex;
 	}
@@ -96,5 +102,6 @@ public class VirtualLink {
 		FSNum = fSNum;
 	}
 */
+	
 	
 }
