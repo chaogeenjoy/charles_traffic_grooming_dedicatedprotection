@@ -1,6 +1,9 @@
 package test;
 
+import java.util.Iterator;
+
 import network.Layer;
+import network.Link;
 import network.Network;
 import trafficGrooming.GroomingwithSBPP;
 
@@ -18,5 +21,18 @@ public class SBPPGroomingTester {
 		grooming.SBPPgrooming(ipLayer, optLayer);
 		
 		System.out.println("\n\n所需要的Transponder的数量为"+grooming.getTransponderNum());
+		
+		
+		int maxSlot=0;
+		Iterator<String> itr=optLayer.getLinklist().keySet().iterator();
+		while(itr.hasNext()){
+			Link link=(Link) (optLayer.getLinklist().get(itr.next()));
+			if(maxSlot<link.getMaxSlot()){
+				maxSlot=link.getMaxSlot();
+			}
+		}
+		
+		
+		System.out.println("Max Slot="+maxSlot);
 	}
 }
