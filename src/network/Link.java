@@ -25,6 +25,7 @@ public class Link extends CommonObject {
 	private ArrayList<Slot> slotsArray;
 	private ArrayList<Integer> slotsIndexInOneSW;
 	private ArrayList<VirtualLink> virtualLinkList=new ArrayList<VirtualLink>();
+	private VirtualLink tempVirtualLink=null;
 //	private ArrayList
 	private ArrayList<Link> physicalLink;// 在物理层所经过的link
 
@@ -176,6 +177,16 @@ public class Link extends CommonObject {
 
 	public void setVirtualLinkList(ArrayList<VirtualLink> virtualLinkList) {
 		this.virtualLinkList = virtualLinkList;
+	}
+	
+	
+
+	public VirtualLink getTempVirtualLink() {
+		return tempVirtualLink;
+	}
+
+	public void setTempVirtualLink(VirtualLink tempVirtualLink) {
+		this.tempVirtualLink = tempVirtualLink;
 	}
 
 	public ArrayList<Link> getPhysicalLink() {
