@@ -10,7 +10,7 @@ import trafficGrooming.GroomingwithSBPP;
 public class SBPPGroomingTester {
 	public static void main(String[] args) {
 		Network network=new Network("ip over wdm", 0, "");
-		network.readPhysicalTopology("E:\\其他\\RPtopology\\NODE6.csv");
+		network.readPhysicalTopology("E:\\其他\\RPtopology\\NODE24.csv");
 		network.copyNodes();
 		network.createNodepair();
 		

@@ -8,6 +8,7 @@ import general.Constant;
 import network.Layer;
 import network.Link;
 import network.NodePair;
+import network.VirtualLink;
 import subgraph.LinearRoute;
 
 public class Request {
@@ -16,6 +17,7 @@ public class Request {
 	private int slots;
 	private ArrayList<Link> route;
 	private int protection_index;
+	private ArrayList<VirtualLink> vtLinkList;
 
 	public Request(NodePair nodepair, int slots) {
 		this.setNodepair(nodepair);
@@ -30,6 +32,7 @@ public class Request {
 	public Request() {
 		super();
 		// TODO Auto-generated constructor stub
+		
 	}
 
 
@@ -77,7 +80,7 @@ public class Request {
 				for (int r = 0; r <= link.getSlotsArray().size() - route.getSlotsnum(); r++) {
 					int s = 1;
 					for(int k = r; k < route.getSlotsnum() + r; k++) {
-						if (link.getSlotsArray().get(k).getStatus()==1) {//只要一个SW中有一个slot被占用，s=0，意味着该SW不能用
+						if (link.getSlotsArray().get(k).getStatus()!=0) {//只要一个SW中有一个slot被占用，s=0，意味着该SW不能用
 							s = 0;
 							break;
 						}
@@ -247,5 +250,20 @@ public class Request {
 	public int getprotection_index() {
 		return protection_index;
 	}
+
+
+
+
+	public ArrayList<VirtualLink> getVtLinkList() {
+		return vtLinkList;
+	}
+
+
+
+
+	public void setVtLinkList(ArrayList<VirtualLink> vtLinkList) {
+		this.vtLinkList = vtLinkList;
+	}
+	
 
 }

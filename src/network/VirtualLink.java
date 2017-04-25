@@ -10,8 +10,8 @@ public class VirtualLink {
 //	private double sumFlow;//总的占用
 	private double remanCapacity;//剩余容量S
 	private ArrayList<Link> phyLinkList = null;
-//	private int startIndex;
-//	private int FSNum;
+	private int startIndex;
+	private int FSNum;
 
 	public VirtualLink(double cost, double length, double capacity, double remanCapacity) {
 		super();
@@ -80,13 +80,8 @@ public class VirtualLink {
 		this.phyLinkList = phyLinkList;
 	}
 
-	@Override
-	public String toString() {
-		return "VirtualLink [nature=" + nature + ", cost=" + cost + ", length=" + length + ", capacity=" + capacity
-				+ ", remanCapacity=" + remanCapacity + "]";
-	}
-
-	/*public int getStartIndex() {
+	
+	public int getStartIndex() {
 		return startIndex;
 	}
 
@@ -101,7 +96,12 @@ public class VirtualLink {
 	public void setFSNum(int fSNum) {
 		FSNum = fSNum;
 	}
-*/
-	
+
+	@Override
+	public String toString() {
+		return "VirtualLink [nature=" + nature + ", cost=" + cost + ", length=" + length + ", capacity=" + capacity
+				+ ", remanCapacity=" + remanCapacity + "]";
+	}
+
 	
 }
