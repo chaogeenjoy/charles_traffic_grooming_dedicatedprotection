@@ -14,16 +14,20 @@ import subgraph.LinearRoute;
 public class Request {
 	private NodePair nodepair;
 	private double bandwidth;
+	private int requestRate;
 	private int slots;
 	private ArrayList<Link> route;
-	private int protection_index;
 	private ArrayList<VirtualLink> vtLinkList;
+	private double arrivalTime;
+	private double departTime;
+	private char reqType;
 
-	public Request(NodePair nodepair, int slots) {
+	public Request(NodePair nodepair,int requestRate,double arrTime,double departTime,char reqType) {
 		this.setNodepair(nodepair);
-		nodepair.setSlotsnum(slots);
-		this.setRoute(nodepair.getLinearroutelist().get(0).getLinklist());
-		this.setSlots(slots);
+		this.setRequestRate(requestRate);
+		this.setArrivalTime(arrTime);
+		this.setDepartTime(departTime);
+		this.setReqType(reqType);
 	}
 	
 
@@ -235,6 +239,21 @@ public class Request {
 		return route;
 	}
 
+	
+	public int getRequestRate() {
+		return requestRate;
+	}
+
+
+
+
+	public void setRequestRate(int requestRate) {
+		this.requestRate = requestRate;
+	}
+
+
+
+
 	public void setSlots(int slots) {
 		this.slots = slots;
 	}
@@ -243,13 +262,6 @@ public class Request {
 		return slots;
 	}
 
-	public void setprotection_index(int firstindex) {
-		this.protection_index = firstindex;
-	}
-
-	public int getprotection_index() {
-		return protection_index;
-	}
 
 
 
@@ -264,6 +276,50 @@ public class Request {
 	public void setVtLinkList(ArrayList<VirtualLink> vtLinkList) {
 		this.vtLinkList = vtLinkList;
 	}
+
+
+
+
+	public double getArrivalTime() {
+		return arrivalTime;
+	}
+
+
+
+
+	public void setArrivalTime(double arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+
+
+
+
+	public double getDepartTime() {
+		return departTime;
+	}
+
+
+
+
+	public void setDepartTime(double departTime) {
+		this.departTime = departTime;
+	}
+
+
+
+
+	public char getReqType() {
+		return reqType;
+	}
+
+
+
+
+	public void setReqType(char reqType) {
+		this.reqType = reqType;
+	}
+	
+	
 	
 
 }
